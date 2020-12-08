@@ -1,0 +1,53 @@
+* {
+  font-family: 'Roboto', sans-serif;
+  color: white;
+}
+
+
+header h1{
+  color: white;
+
+}
+
+header {
+  background: #492b7c
+
+}
+
+body {
+background: lightgray;
+}
+
+.container {
+width: 30%;
+}
+
+.container h1 {
+  text-align: center;
+}
+
+.button {
+
+}
+
+#central-panel {
+  width: 300px;
+  height: 300px;
+  background: #2D3261;
+  box-shadow: 0 0 19px 6px #3F51B5;
+  margin: 13% auto !important;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+#central-panel form {
+
+}
+
+.lform-input {
+  color: black;
+}
+
+.m-auto {
+  margin: 0 auto;
+}
