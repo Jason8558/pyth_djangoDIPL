@@ -1,14 +1,13 @@
 {%extends "reg_jounals/index.html" %}
 
-{%block title%}Приказы по другим вопросам{%endblock%}
-{%block header%} <a class="btn btn-outline-info" href="../"> < назад</a> Журнал регистрации приказов по другим вопросам. Всего: {{count}}.  {%endblock%}
+{%block title%}Приказы по личному составу{%endblock%}
+{%block header%} <a class="btn btn-outline-info" href="../"> < назад</a> Журнал регистрации приказов по личному составу. Всего: {{count}}.  {%endblock%}
 {%block content%}
-<form action="{% url 'orders_on_others' %}">
-  <input type="search" id="search_date" name="oom_search_from" placeholder="C">
-  <input type="search" id="search_date2" name="oom_search_to" placeholder="По">
+<form action="{% url 'orders_on_personnel' %}">
+  <input type="search" name="op_search" placeholder="Поиск по ФИО..">
   <button class="btn btn-sm btn-warning" type="submit" name="" value="Найти">Найти</button>
 </form>
-<a class="btn btn-success btn-lg m-bottom btn-add " href="{%url 'orders_on_others_add_url'%}"> + Добавить</a>
+<a class="btn btn-success btn-lg m-bottom btn-add " href="{%url 'orders_on_personnel_add_url'%}"> + Добавить</a>
 {% if orders %}
 <table>
   <thead class="thead-dark">
@@ -16,8 +15,10 @@
 
     <th scope="col">Дата приказа</th>
     <th scope="col">Номер</th>
-    <th scope="col">Содержание</th>
+    <th scope="col">Сотрудник</th>
+    <th scope="col">Подразделение</th>
     <th scope="col">Ответственный сотрудник</th>
+
 
 
   </tr>
@@ -25,12 +26,14 @@
 
   {%for order in orders%}
 
-<tr onclick="return location.href = '{% url 'orders_on_others_upd_url' id=order.id%}' ">
+<tr onclick="return location.href = '{% url 'orders_on_personnel_upd_url' id=order.id%}' ">
 
-    <td>{{order.oom_date|date:"d.m.Y"}}</td>
-    <td>{{order.oom_number}}</td>
-    <td>{{order.oom_content}}</td>
-    <td>{{order.oom_res_officer}}</td>
+    <td>{{order.op_date|date:"d.m.Y"}}</td>
+    <td>{{order.op_number}}</td>
+    <td>{{order.op_emloyer}}</td>
+    <td>{{order.op_dep}}</td>
+    <td>{{order.op_res_officer}}</td>
+
 
 </tr>
   {%endfor%}

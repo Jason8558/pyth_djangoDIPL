@@ -1,23 +1,25 @@
 {%extends "reg_jounals/index.html" %}
 
-{%block title%}Приказы по другим вопросам{%endblock%}
-{%block header%} <a class="btn btn-outline-info" href="../"> < назад</a> Журнал регистрации приказов по другим вопросам. Всего: {{count}}.  {%endblock%}
+{%block title%}Трудовые договоры{%endblock%}
+{%block header%} <a class="btn btn-outline-info" href="../"> < назад</a> Журнал регистрации трудовых договоров. Всего: {{count}}.  {%endblock%}
 {%block content%}
-<form action="{% url 'orders_on_others' %}">
-  <input type="search" id="search_date" name="oom_search_from" placeholder="C">
-  <input type="search" id="search_date2" name="oom_search_to" placeholder="По">
+<form action="{% url 'labor_contracts' %}">
+  <input type="search" name="lc_search" placeholder="Поиск по подразделению..">
   <button class="btn btn-sm btn-warning" type="submit" name="" value="Найти">Найти</button>
 </form>
-<a class="btn btn-success btn-lg m-bottom btn-add " href="{%url 'orders_on_others_add_url'%}"> + Добавить</a>
+<a class="btn btn-success btn-lg m-bottom btn-add " href="{%url 'labor_contracts_add_url'%}"> + Добавить</a>
 {% if orders %}
 <table>
   <thead class="thead-dark">
   <tr class="tr-header">
 
-    <th scope="col">Дата приказа</th>
+    <th scope="col">Дата договора</th>
     <th scope="col">Номер</th>
-    <th scope="col">Содержание</th>
+    <th scope="col">Принимаемый сотрудник</th>
+    <th scope="col">Подразделение</th>
+    <th scope="col">Дата приема</th>
     <th scope="col">Ответственный сотрудник</th>
+
 
 
   </tr>
@@ -25,12 +27,15 @@
 
   {%for order in orders%}
 
-<tr onclick="return location.href = '{% url 'orders_on_others_upd_url' id=order.id%}' ">
+<tr onclick="return location.href = '{% url 'labor_contracts_upd_url' id=order.id%}' ">
 
-    <td>{{order.oom_date|date:"d.m.Y"}}</td>
-    <td>{{order.oom_number}}</td>
-    <td>{{order.oom_content}}</td>
-    <td>{{order.oom_res_officer}}</td>
+    <td>{{order.lc_date|date:"d.m.Y"}}</td>
+    <td>{{order.lc_number}}</td>
+    <td>{{order.lc_emloyer}}</td>
+    <td>{{order.lc_dep}}</td>
+    <td>{{order.lc_dateOfInv}}</td>
+    <td>{{order.lc_res_officer}}</td>
+
 
 </tr>
   {%endfor%}

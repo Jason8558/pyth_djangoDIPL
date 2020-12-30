@@ -1,7 +1,7 @@
 {% extends "reg_jounals/index.html" %}
 
-{%block title%}Добавить запись{% endblock %}
-{%block header%}Изменить запись - Заявление на увольнение № {{letter.id}} от {{letter.lor_date}}{% endblock %}
+{%block title%}Приказ №{{order.bt_number}} {% endblock %}
+{%block header%}Изменить запись - Приказ о командировке{% endblock %}
 
 {%block content%}
 {% if form.errors%}
@@ -17,8 +17,8 @@
   {% endfor%}
 
   <input class="btn btn-success" type="submit" value="Сохранить" />
-  <a class="btn btn-outline-danger" href="{% url 'letter_resignation_del_url' id=letter.id%}">Удалить запись</a>
   <a class="btn btn-outline-info" href="..">Отмена</a>
+  <a class="btn btn-outline-danger" href="{% url 'orders_of_BTrip_del_url' id=order.id%}">Удалить запись</a>
 </form>
 
 {%endblock%}

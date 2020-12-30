@@ -1,8 +1,12 @@
 {%extends "reg_jounals/index.html" %}
 
 {%block title%}Заявления на прием{%endblock%}
-{%block header%}<a href="../">Назад</a> Журнал регистрации заявлений на прием. Всего: {{count}}.  {%endblock%}
+{%block header%}<a class="btn btn-outline-info" href="../">< назад</a> Журнал регистрации заявлений на прием. Всего: {{count}}.  {%endblock%}
 {%block content%}
+<form action="{% url 'invite' %}">
+  <input type="search" name="loi_search" placeholder="Поиск по ФИО..">
+  <button class="btn btn-sm btn-warning" type="submit" name="" value="Найти">Найти</button>
+</form>
 <a class="btn btn-success btn-lg m-bottom btn-add" href="{% url 'invite_add' %}"> + Добавить</a>
 {% if letters %}
 <table>
@@ -15,14 +19,14 @@
     <th scope="col">Подразделение</th>
     <th scope="col">Дата начала работы</th>
     <th scope="col">Ответственный сотрудник</th>
-    <th scope="col"></th>
+
 
   </tr>
   </thead>
 
   {%for let in letters%}
 
-  <tr>
+  <tr onclick="return location.href = '{% url 'invite_upd_url' id=let.id%}' ">
 
     <td>{{let.id}}</td>
     <td>{{let.loi_date|date:"d.m.Y"}}</td>
@@ -31,11 +35,43 @@
     <td>{{let.loi_department}}</td>
     <td>{{let.loi_dateOfInv|date:"d.m.Y"}}</td>
     <td>{{let.loi_res_officer}}</td>
-    <td><a class="btn btn-outline-warning" href="#">Изменить</a></td>
+
 </tr>
   {%endfor%}
 </table>
 {%else%}
 <h2>Записей нет</h2>
 {%endif%}
+
+<nav  class="paginator" aria-label="Page navigation example">
+  <ul class="pagination">
+    <li class="page-item">
+      <a class="page-link" href="#" aria-label="Previous">
+<span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+{% for p in letters.paginator.page_range %}
+  {% if letters.number == p%}
+   <li class="page-item active"><a class="page-link" href="?page={{p}}">{{ p }}</a></li>
+   {%else%}
+        <li class="page-item"><a class="page-link" href="?page={{p}}">{{ p }}</a></li>
+    {%endif%}
+  {% endfor %}
+
+{%if letters.has_next%}
+    <li class="page-item">
+      <a class="page-link" href='?page={{letters.next_page_number}}' aria-label="Next">
+<span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  {%else%}
+  <li class="page-item disabled">
+    <a class="page-link" href='#' aria-disabled='true' aria-label="Next">
+      <span aria-hidden="true">&raquo;</span>
+    </a>
+  </li>
+  {%endif%}
+  </ul>
+</nav>
+
 {%endblock%}

@@ -1,14 +1,9 @@
 {%extends "reg_jounals/index.html" %}
 
-{%block title%}Приказы по другим вопросам{%endblock%}
-{%block header%} <a class="btn btn-outline-info" href="../"> < назад</a> Журнал регистрации приказов по другим вопросам. Всего: {{count}}.  {%endblock%}
+{%block title%}Приказы на отпуск{%endblock%}
+{%block header%} <a class="btn btn-outline-info" href="../"> < назад</a> Журнал регистрации приказов на отпуск. Всего: {{count}}.  {%endblock%}
 {%block content%}
-<form action="{% url 'orders_on_others' %}">
-  <input type="search" id="search_date" name="oom_search_from" placeholder="C">
-  <input type="search" id="search_date2" name="oom_search_to" placeholder="По">
-  <button class="btn btn-sm btn-warning" type="submit" name="" value="Найти">Найти</button>
-</form>
-<a class="btn btn-success btn-lg m-bottom btn-add " href="{%url 'orders_on_others_add_url'%}"> + Добавить</a>
+<a class="btn btn-success btn-lg m-bottom btn-add " href="{%url 'orders_on_vacation_add_url'%}"> + Добавить</a>
 {% if orders %}
 <table>
   <thead class="thead-dark">
@@ -16,7 +11,6 @@
 
     <th scope="col">Дата приказа</th>
     <th scope="col">Номер</th>
-    <th scope="col">Содержание</th>
     <th scope="col">Ответственный сотрудник</th>
 
 
@@ -25,12 +19,11 @@
 
   {%for order in orders%}
 
-<tr onclick="return location.href = '{% url 'orders_on_others_upd_url' id=order.id%}' ">
+<tr onclick="return location.href = '{% url 'orders_on_vacation_upd_url' id=order.id%}' ">
 
-    <td>{{order.oom_date|date:"d.m.Y"}}</td>
-    <td>{{order.oom_number}}</td>
-    <td>{{order.oom_content}}</td>
-    <td>{{order.oom_res_officer}}</td>
+    <td>{{order.oov_date|date:"d.m.Y"}}</td>
+    <td>{{order.oov_number}}</td>
+    <td>{{order.oov_res_officer}}</td>
 
 </tr>
   {%endfor%}
