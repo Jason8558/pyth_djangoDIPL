@@ -14,7 +14,7 @@ class OutBoundDocument(models.Model):
     doc_res_officer = models.CharField(blank=True, editable=False,  max_length=256, help_text="Сотрудник, который внес документ в систему ", verbose_name='Ответственный сотрудник')
 
     class Meta:
-        ordering = ["doc_number"]
+        ordering = ["id"]
         verbose_name = 'Исходящий документ'
         verbose_name_plural = 'Исходящие документы'
 
@@ -34,7 +34,7 @@ class LetterOfResignation(models.Model):
     lor_res_officer = models.CharField(blank=True, editable=False,  max_length=256, help_text="Сотрудник, который внес документ в систему ", verbose_name='Ответственный сотрудник')
 
     class Meta:
-        ordering = ["lor_number"]
+        ordering = ["id"]
         verbose_name = 'Заявление на увольнение'
         verbose_name_plural = 'Заявления на увольнение'
 
@@ -49,7 +49,7 @@ class LetterOfInvite(models.Model):
     loi_res_officer = models.CharField(blank=True, editable=False,  max_length=256, help_text="Сотрудник, который внес документ в систему ", verbose_name='Ответственный сотрудник')
 
     class Meta:
-        ordering = ["loi_number"]
+        ordering = ["id"]
         verbose_name = 'Заявление на прием'
         verbose_name_plural = 'Заявления на прием'
 
@@ -86,7 +86,7 @@ class OrdersOfBTrip(models.Model):
     bt_res_officer = models.CharField(blank=True, editable=False,  max_length=256, help_text="Сотрудник, который внес документ в систему ", verbose_name='Ответственный сотрудник')
 
     class Meta:
-        ordering = ["bt_number"]
+        ordering = ["id"]
         verbose_name = 'Приказ о командировке'
         verbose_name_plural = 'Приказы о командировках'
 
@@ -100,10 +100,11 @@ class OrdersOnPersonnel(models.Model):
     op_dep = models.ForeignKey('Departments', on_delete=models.CASCADE,  verbose_name="Подразделение ", default="1")
     op_emloyer = models.CharField(max_length=256, help_text="Введите ФИО сотрудника", verbose_name="ФИО сотрудника", db_index=True)
     op_content = models.TextField(help_text="Введите содержание", verbose_name="Содержание приказа")
+    op_selected = models.BooleanField(verbose_name="Выделить в списке", default=False)
     op_res_officer = models.CharField(blank=True, editable=False,  max_length=256, help_text="Сотрудник, который внес документ в систему ", verbose_name='Ответственный сотрудник')
 
     class Meta:
-        ordering = ["op_number"]
+        ordering = ["id"]
         verbose_name = 'Приказ по личному составу'
         verbose_name_plural = 'Приказы по личному составу'
 
@@ -122,7 +123,7 @@ class LaborContract(models.Model):
     lc_res_officer = models.CharField(blank=True, editable=False,  max_length=256, help_text="Сотрудник, который внес документ в систему ", verbose_name='Ответственный сотрудник')
 
     class Meta:
-        ordering = ["lc_number"]
+        ordering = ["id"]
         verbose_name = 'Трудовой договор'
         verbose_name_plural = 'Трудовые договоры'
 
@@ -141,6 +142,36 @@ class EmploymentHistory(models.Model):
     eh_dateOfResign = models.DateField(null=True, blank=True, help_text="Введите дату увольнения", verbose_name="Дата увольнения", db_index=True)
     eh_res_officer = models.CharField(blank=True, editable=False,  max_length=256, help_text="Сотрудник, который внес документ в систему ", verbose_name='Ответственный сотрудник')
 
+class SickRegistry(models.Model):
+    sr_number = models.IntegerField(help_text="Введите номер реестра", verbose_name="Номер реестра", db_index=True)
+    sr_res_officer = models.CharField(blank=True, editable=False,  max_length=256, help_text="Сотрудник, который создал реестр ", verbose_name='Ответственный сотрудник')
+
+    class Meta:
+        ordering = ["sr_number"]
+        verbose_name = 'Реестр больничных листов'
+        verbose_name_plural = 'Реестры больничных листов'
+    def __str__(self):
+        reg_num = str(self.sr_number)
+        return reg_num
+class SickDocument(models.Model):
+    sd_reg_number = models.CharField(max_length=256, blank=True, help_text="Введите номер реестра", verbose_name="№ реестра ", default=" ")
+    sd_number = models.CharField(max_length=256, help_text="Введите номер б\л", verbose_name="Номер б\л", db_index=True)
+    sd_emp = models.CharField(max_length=256, help_text="Введите ФИО сотрудника", verbose_name="ФИО", db_index=True)
+    sd_pos = models.CharField(max_length=256, help_text="Введите должность", verbose_name="Должность", db_index=True)
+    sd_dep = models.ForeignKey('Departments',  on_delete=models.CASCADE, verbose_name="Подразделение ", default="1")
+    sd_dur_from = models.DateField(help_text="Введите дату начала болезни", verbose_name="Дата начала болезни", db_index=True)
+    sd_dur_to = models.DateField(help_text="Введите дату окончания болезни", verbose_name="Дата окончания болезни", db_index=True)
+    sd_comm = models.CharField(blank=True, default=" ", max_length=256, help_text="Введите примечание", verbose_name="Примечание")
+
+    class Meta:
+        ordering = ["sd_reg_number"]
+        verbose_name = 'Больничный лист'
+        verbose_name_plural = 'Больничные листы'
+
+    def __str__(self):
+        doc_name = 'Больничный № ' + str(self.sd_number) + ' в реестре № ' + str(self.sd_reg_number)
+        return doc_name
+
 class Departments(models.Model):
     dep_name = models.CharField(max_length=256,  help_text="Введите название подразделения", verbose_name="Название подразделения", db_index=True)
 
@@ -151,110 +182,3 @@ class Departments(models.Model):
     def __str__(self):
         doc_fullname = self.dep_name
         return doc_fullname
-# ТАБЕЛЬ ------------------------------------------------------------
-class Positions (models.Model):
-    p_name = models.CharField(max_length=256, help_text="Введите наименование", verbose_name="Наименование ", db_index=True)
-
-    class Meta:
-        ordering = ["p_name"]
-        verbose_name = 'Должность'
-        verbose_name_plural = 'Справочник должностей'
-
-    def __str__(self):
-        fullname = self.p_name
-        return fullname
-
-class Employers (models.Model):
-    e_name = models.CharField(max_length=256, help_text="Введите ФИО", verbose_name="ФИО", db_index=True)
-    e_dep = models.ForeignKey('Departments', on_delete=models.CASCADE, verbose_name="Подразделение ")
-    e_pos = models.ForeignKey('Positions', on_delete=models.CASCADE, verbose_name="Должность ")
-    e_razr = models.CharField(max_length=2, help_text="Введите разряд", verbose_name="Разряд ", db_index=True)
-    e_lpay = models.CharField(max_length=2, help_text="Введите ступень оплаты", verbose_name="Ступень оплаты ", db_index=True)
-
-    class Meta:
-        ordering = ["e_name"]
-        verbose_name = 'Сотрудник'
-        verbose_name_plural = 'Справочник сотрудников'
-
-    def __str__(self):
-        fullname = self.e_name
-        return fullname
-
-class Tabel(models.Model):
-    t_year = models.CharField(max_length=4, help_text="Введите год", verbose_name="Год", db_index=True)
-    t_month = models.CharField(max_length=4, help_text="Введите месяц", verbose_name="Месяц", db_index=True)
-    t_employer =  models.ForeignKey('Employers', on_delete=models.CASCADE, verbose_name="Сотрудник ")
-    t_dep = models.ForeignKey('Departments', on_delete=models.CASCADE, verbose_name="Подразделение ", default="1")
-    t_TypeTime1 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime2 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime3 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime4 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime5 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime6 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime7 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime8 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime9 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime10 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime11 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime12 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime13 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime14 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime15 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime16 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime17 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime18 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime19 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime20 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime21 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime22 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime23 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime24 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime25 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime26 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime27 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime28 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime29 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime30 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_TypeTime31 = models.CharField(max_length=4, help_text="", verbose_name="", db_index=True)
-    t_time1 = models.IntegerField();
-    t_time2 = models.IntegerField();
-    t_time3 = models.IntegerField();
-    t_time4 = models.IntegerField();
-    t_time5 = models.IntegerField();
-    t_time6 = models.IntegerField();
-    t_time7 = models.IntegerField();
-    t_time8 = models.IntegerField();
-    t_time9 = models.IntegerField();
-    t_time10 = models.IntegerField();
-    t_time11 = models.IntegerField();
-    t_time12 = models.IntegerField();
-    t_time13 = models.IntegerField();
-    t_time14 = models.IntegerField();
-    t_time15 = models.IntegerField();
-    t_time16 = models.IntegerField();
-    t_time17 = models.IntegerField();
-    t_time18 = models.IntegerField();
-    t_time19 = models.IntegerField();
-    t_time20 = models.IntegerField();
-    t_time21 = models.IntegerField();
-    t_time22 = models.IntegerField();
-    t_time23 = models.IntegerField();
-    t_time24 = models.IntegerField();
-    t_time25 = models.IntegerField();
-    t_time26 = models.IntegerField();
-    t_time27 = models.IntegerField();
-    t_time28 = models.IntegerField();
-    t_time29 = models.IntegerField();
-    t_time30 = models.IntegerField();
-    t_time31 = models.IntegerField();
-    t_workdays = models.IntegerField(verbose_name='Кол-во явок (часы)', default=0);
-    t_weekends = models.IntegerField(verbose_name='Кол-во выходных (часы)', default=0);
-
-    class Meta:
-        ordering = ["t_year"]
-        verbose_name = 'Табель'
-        verbose_name_plural = 'Табели'
-
-    def __str__(self):
-        fullname = 'Табель за ' + self.t_month + ' ' + self.t_year + ' ' + self.t_dep.dep_name
-        return fullname

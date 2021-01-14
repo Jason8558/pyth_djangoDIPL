@@ -30,9 +30,20 @@ header {
   margin: 0 auto;
 }
 
+.sick_list {
+  grid-template-rows: none;
+  grid-gap: 15px;
+}
+
+.add_sk_item {
+  border: solid 1px #785589;
+    padding: 15px;
+    box-shadow: 0px 0px 9px 1px #785589;
+}
+
 .vac_upd {
-  grid-template-rows: none;
-  width: 70%;
+grid-template-rows: none;
+width: 70%;
 }
 
 .add_list {
@@ -51,18 +62,27 @@ height: 149px;}
 
 
 .container_grid {
-width: 50%;
-padding: 0 25px;
-margin: auto;
-display: grid;
-grid-template-columns: repeat(1, 100%) !important;
-/* grid-template-rows: repeat(3, 100px); */
-grid-gap: 11px;
+
+width: 50%;
+
+padding: 0 25px;
+
+margin: auto;
+
+display: grid;
+
+grid-template-columns: repeat(3, 150px) !important;
+
+grid-template-rows: repeat(4, 100px);
+
+grid-gap: 27px;
 }
 
 .container {
   margin-top: 10px;
 }
+
+
 
 
 
@@ -111,15 +131,20 @@ box-shadow: 0px 1px 3px 1px black;
   width: 94%
 }
 
-.btn-info {
-  background: #4c9c43 !important;
+.main_button{
+
+  background: #2d3261 !important;
   border-color: none !important;
+
+
 }
 
-.btn-info:hover {
-border-color: #4ec35200 !important;
-box-shadow: 0 0 4px 2px #21b332!important;
-transition: 0.2s !important;
+.main_button:hover {
+
+
+    border-color: #785589 !important;
+    box-shadow: 0 0 4px 2px #785589 !important;
+    transition: 0.2s !important;
 }
 
 .btn-info:focus {
@@ -132,9 +157,12 @@ box-shadow: 0px 1px 3px 1px black;
 }
 
 .navbar {
-  background-color: #21b332 !important;
+
   color: white;
+background: #977390;
   box-shadow: 0 3px 10px -2px black;
+    /* background-image: url(/static/img/background.jpg);
+    background-position-y: center; */
 }
 
 .button:hover {
@@ -160,8 +188,12 @@ box-shadow: 0px 1px 3px 1px black;
 
   table .tr-header
   {
-    background: #977390;
+    background: #977390 ;
 
+  }
+
+  table #selected_rec:hover {
+    background: #785589 !important;
   }
 
   table .tr-header:hover
@@ -170,7 +202,7 @@ box-shadow: 0px 1px 3px 1px black;
     color: black;
   }
   table tr:hover {
-    background: #785589;
+    background: #785589 ;
     color: white;
   }
 

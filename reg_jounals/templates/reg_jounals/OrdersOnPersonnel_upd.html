@@ -1,10 +1,12 @@
 {% extends "reg_jounals/index.html" %}
 
+
 {%block title%}Приказ №{{order.op_number}}{% endblock %}
 {%block header%}Изменить запись - Приказ №{{order.op_number}}{% endblock %}
 
 {%block content%}
 {% if form.errors%}
+
 
 <div class="alert alert-danger mt-5" role="alert">
 {{form.errors}}
@@ -12,12 +14,21 @@
 {%endif%}
 <form class="add_form" action="" method="post">
   {% csrf_token %}
-  {% for field in form %}
-  <p>{{field.label}}{{ field }}</p>
-  {% endfor%}
+
+  <p>{{form.op_selected.label}}:{{form.op_selected}}</p>
+  <p>{{form.op_date.label}}:{{form.op_date}}</p>
+  <p>{{form.op_emloyer.label}}:{{form.op_emloyer}}</p>
+  <p>{{form.op_dep.label}}:{{form.op_dep}}</p>
+  <p>{{form.op_content.label}}:{{form.op_content}}</p>
+
 
   <input class="btn btn-success" type="submit" value="Сохранить" />
-  <a class="btn btn-outline-danger" href="{% url 'orders_on_personnel_del_url' id=order.id%}">Удалить</a>
+  <a id="sure_btn" onclick="OpenSureDialog()" class="btn btn-outline-danger">Удалить</a>
+  <div id="sure" style="display: none;" class="yousure">
+    <p>Вы уверены? <span style="color: red;"><b>ЭТО ДЕЙСТВИЕ НЕОБРАТИМО</b></span></p>
+    <a class="btn btn-outline-danger" href="{% url 'orders_on_personnel_del_url' id=order.id%}">Да</a>
+
+  </div>
   <a class="btn btn-outline-info" href="..">Отмена</a>
 </form>
 

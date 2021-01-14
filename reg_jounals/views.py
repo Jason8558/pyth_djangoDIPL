@@ -5,20 +5,25 @@ from .forms import *
 from django.shortcuts import redirect
 from django.core.paginator import Paginator
 import datetime as DT
+from itertools import groupby
 
 page_count = 15
 
-
-
 def index(request):
     if request.user.is_authenticated:
+
         return render(request, 'reg_jounals/index.html')
+
     else: return redirect('/accounts/login/')
 
-def RegJournals(request):
+def logfile(request):
     if request.user.is_authenticated:
-        return render(request, 'reg_jounals/journals.html')
-    else: return render(request, 'reg_jounals/no_auth.html')
+        logfile = open('log.txt')
+        log = []
+        for line in logfile:
+            log.append(line)
+    return render(request, 'reg_jounals/log.html', context={'log':log})
+
 
 def outbound_docs(request):
     if request.user.is_authenticated:
@@ -30,7 +35,7 @@ def outbound_docs(request):
             date_to = DT.datetime.strptime(date_to, '%d.%m.%Y').date()
             documents = OutBoundDocument.objects.filter(doc_date__range=(date_from, date_to)).order_by('doc_date')
         else:
-            documents = OutBoundDocument.objects.all()
+            documents = OutBoundDocument.objects.all().order_by('-id')
         p_documents = Paginator(documents, 15)
         page_number = request.GET.get('page', 1)
         page = p_documents.get_page(page_number)
@@ -49,16 +54,14 @@ def nr_OutBoundDocument(request):
         if docs_count == 0:
             doc_next_num_ = 1
         else:
-            doc_prev_num = docs[doc_count - 1].doc_number
+            doc_prev_num = documents[docs_count - 1].doc_number
             doc_next_num_ = int(doc_prev_num) + 1
         if request.method == "POST":
             doc_form = OutBoundDocument_form(request.POST)
             if doc_form.is_valid():
                 user_ = request.user.first_name
 
-                doc_form.doc_res_officer = user_
-                print(str(doc_form.doc_res_officer))
-                doc_form.saveFirst(user_, doc_next_num_)
+                doc_form.saveFirst(user_)
                 return redirect('../outbound_docs/')
         else:
             doc_form = OutBoundDocument_form()
@@ -94,7 +97,7 @@ def letter_of_resignation(request):
         if search_query:
             letters = LetterOfResignation.objects.filter(lor_employee__icontains=search_query)
         else:
-            letters = LetterOfResignation.objects.all()
+            letters = LetterOfResignation.objects.all().order_by('-id')
         count = len(letters)
         p_letters = Paginator(letters, 10)
         page_number = request.GET.get('page', 1)
@@ -120,7 +123,7 @@ def nr_LetterOfResignation(request):
             letter_form = LetterOfResignation_form(request.POST)
             if letter_form.is_valid():
                 user_ = request.user.first_name
-                letter_form.saveFirst(user_, letter_next_num_)
+                letter_form.saveFirst(user_)
                 return redirect('../letters_of_resignation/')
         else:
 
@@ -161,7 +164,7 @@ def letter_of_invite(request):
             if search_query:
                 letters = LetterOfInvite.objects.filter(loi_employee__icontains=search_query)
             else:
-                letters = LetterOfInvite.objects.all()
+                letters = LetterOfInvite.objects.all().order_by('-id')
             count = len(letters)
 
             p_letters = Paginator(letters, 10)
@@ -200,7 +203,7 @@ def nr_LetterOfInvite(request):
             letter_form = LetterOfInvite_form(request.POST)
             if letter_form.is_valid():
                 user_ = request.user.first_name
-                letter_form.saveFirst(user_, letter_next_num_)
+                letter_form.saveFirst(user_)
                 return redirect('../letters_of_invite/')
         return render(request, 'reg_jounals/LetterOfInvite_add.html', context={'form':letter_form, 'next_num':letter_next_num_})
     else:
@@ -221,7 +224,7 @@ def order_other_matters(request):
             date_to = DT.datetime.strptime(date_to, '%d.%m.%Y').date()
             orders = OrdersOnOtherMatters.objects.filter(oom_date__range=(date_from, date_to)).order_by('oom_date')
         else:
-            orders = OrdersOnOtherMatters.objects.all().order_by('-oom_number')
+            orders = OrdersOnOtherMatters.objects.all().order_by('-id')
         p_orders = Paginator(orders, 10)
         page_number = request.GET.get('page', 1)
         page = p_orders.get_page(page_number)
@@ -245,7 +248,7 @@ def nr_OrderOnOtherMatters(request):
             order_form =OrdersOnOtherMatters_form(request.POST)
             if order_form.is_valid():
                 user_ = request.user.first_name
-                order_form.saveFirst(user_,order_next_num_)
+                order_form.saveFirst(user_)
                 return redirect('../orders_on_others/')
 
 
@@ -275,7 +278,7 @@ def del_OrderOnOtherMatters(request, id):
 
 def order_on_vacation(request):
     if request.user.is_authenticated:
-        orders =OrdersOnVacation.objects.all()
+        orders =OrdersOnVacation.objects.all().order_by('-id')
         p_orders = Paginator(orders, page_count)
         page_number = request.GET.get('page', 1)
         page = p_orders.get_page(page_number)
@@ -301,7 +304,7 @@ def nr_OrderOnVacation(request):
             order_form =OrdersOnVacation_form(request.POST)
             if order_form.is_valid():
                 user_ = request.user.first_name
-                order_form.saveFirst(user_, order_next_num_)
+                order_form.saveFirst(user_)
                 return redirect('../orders_on_vacation/')
 
 
@@ -311,10 +314,11 @@ def nr_OrderOnVacation(request):
 
 def upd_OrderOnVacation(request, id):
     if request.user.is_authenticated:
+        depts = Departments.objects.all()
         if request.method == "GET":
             order = OrdersOnVacation.objects.get(id__iexact=id)
             bound_form = OrdersOnVacation_form(instance=order)
-            return render(request, 'reg_jounals/OrdersOnVacation_upd.html', context={'form':bound_form, 'order':order})
+            return render(request, 'reg_jounals/OrdersOnVacation_upd.html', context={'form':bound_form, 'order':order, 'depts':depts})
         else:
             order = OrdersOnVacation.objects.get(id__iexact=id)
             bound_form = OrdersOnVacation_form(request.POST, instance=order)
@@ -336,7 +340,7 @@ def order_of_BTrip(request):
         if search_query:
             orders = OrdersOfBTrip.objects.filter(bt_emloyer__icontains=search_query)
         else:
-            orders = OrdersOfBTrip.objects.all()
+            orders = OrdersOfBTrip.objects.all().order_by('-id')
 
         p_orders = Paginator(orders, page_count)
         page_number = request.GET.get('page', 1)
@@ -363,7 +367,7 @@ def nr_OrderOfBTrip(request):
             order_form =OrdersOfBTrip_form(request.POST)
             if order_form.is_valid():
                 user_ = request.user.first_name
-                order_form.saveFirst(user_, order_next_num_, trip_dur)
+                order_form.saveFirst(user_)
                 return redirect('../orders_of_BTrip/')
 
     else:
@@ -398,10 +402,20 @@ def del_OrderOfBTrip(request, id):
 def order_on_personnel(request):
     if request.user.is_authenticated:
         search_query = request.GET.get('op_search','')
-        if search_query:
-            orders = OrdersOnPersonnel.objects.filter(op_emloyer__icontains=search_query)
+        date_from = request.GET.get('op_search_from','')
+        date_to = request.GET.get('op_search_to', '')
+        if date_from and date_to:
+            date_from = DT.datetime.strptime(date_from, '%d.%m.%Y').date()
+            date_to = DT.datetime.strptime(date_to, '%d.%m.%Y').date()
+            orders = OrdersOnPersonnel.objects.filter(op_date__range=(date_from, date_to)).order_by('op_date')
         else:
-            orders = OrdersOnPersonnel.objects.all()
+            if search_query:
+                orders = OrdersOnPersonnel.objects.filter(op_emloyer__icontains=search_query).order_by('-id')
+            else:
+                orders = OrdersOnPersonnel.objects.all().order_by('-id')
+
+
+
         p_orders = Paginator(orders, page_count)
         page_number = request.GET.get('page', 1)
         page = p_orders.get_page(page_number)
@@ -414,7 +428,8 @@ def nr_OrderOnPersonnel(request):
     if request.user.is_authenticated:
         order_form = OrdersOnPersonnel_form()
         depts = Departments.objects.all()
-        orders = OrdersOnPersonnel.objects.all()
+        orders = OrdersOnPersonnel.objects.all().order_by('id')
+
         order_count = len(orders)
         if order_count == 0:
             order_next_num_ = 1
@@ -427,7 +442,7 @@ def nr_OrderOnPersonnel(request):
             order_form =OrdersOnPersonnel_form(request.POST)
             if order_form.is_valid():
                 user_ = request.user.first_name
-                order_form.saveFirst(user_, order_next_num_)
+                order_form.saveFirst(user_)
                 return redirect('../orders_on_personnel/')
     else:
         return render(request, 'reg_jounals/no_auth.html')
@@ -460,7 +475,7 @@ def LaborContracts(request):
         if search_query:
             contracts = LaborContract.objects.filter(lc_dep__dep_name__icontains=search_query)
         else:
-            contracts = LaborContract.objects.all()
+            contracts = LaborContract.objects.all().order_by('-id')
         p_orders = Paginator(contracts, 10)
         page_number = request.GET.get('page', 1)
         page = p_orders.get_page(page_number)
@@ -475,7 +490,7 @@ def nr_LaborContract(request):
         depts = Departments.objects.all()
         orders = LaborContract.objects.all()
         year_ = str(DT.date.today().year)
-        year_ = year_[:2]
+        year_ = year_[2:]
         orders_count = len(orders)
         if orders_count == 0:
             order_next_num_ = 1
@@ -487,7 +502,7 @@ def nr_LaborContract(request):
             order_form = LaborContract_form(request.POST)
             if order_form.is_valid():
                 user_ = request.user.first_name
-                order_form.saveFirst(user_, order_next_num_, year_)
+                order_form.saveFirst(user_, year_)
                 return redirect('../laborContracts/')
     else:
         return render(request, 'reg_jounals/no_auth.html')
@@ -521,7 +536,7 @@ def employment_history(request):
             histories = EmploymentHistory.objects.filter(eh_employer__icontains=search_query)
             print(histories)
         else:
-            histories = EmploymentHistory.objects.all()
+            histories = EmploymentHistory.objects.all().order_by('-id')
         p_orders = Paginator(histories, page_count)
         page_number = request.GET.get('page', 1)
         page = p_orders.get_page(page_number)
@@ -569,24 +584,51 @@ def print_EmploymentHistory(request, id):
             history = EmploymentHistory.objects.get(id__iexact=id)
             return render(request, 'reg_jounals/EmploymentHistory_print.html', context={'history':history})
 
-def new_Tabel_setting(request):
-    deps = Departments.objects.all()
-    current_year = request.GET.get('t_year','')
-    current_month = request.GET.get('t_month','')
-    current_dep = request.GET.get('t_dep','')
-    if (current_year) and (current_month):
-        return new_Tabel(request,current_year,current_month,current_dep)
-    else:
-        return render(request, 'reg_jounals/Tabel_set.html', context={'deps':deps})
-
-def new_Tabel(request, year, month, dep):
+def sick_regs(request):
     if request.user.is_authenticated:
-        tabel_form = Tabel_form()
-        print(dep)
-        emps = Employers.objects.filter(e_dep__dep_name__icontains=dep)
+        regs = SickRegistry.objects.all().order_by('-id')
+        return render(request, 'reg_jounals/sick_regs.html', context={'regs':regs})
+    else:
+        return render(request, 'reg_jounals/no_auth.html')
 
+def create_SickRegistry(request, sr_number):
+    if request.user.is_authenticated:
+        positions = SickDocument.objects.filter(sd_reg_number__exact=sr_number)
+        print(positions)
+        count = len(positions)
+        return render(request, 'reg_jounals/sick_reg_create.html', context={'positions':positions, 'rnum':sr_number, 'count':count})
+    else:
+        return render(request, 'reg_jounals/no_auth.html')
+
+def add_SickRegistry(request):
+    if request.user.is_authenticated:
+        reg_form = SickRegistry_form()
+        regs = SickRegistry.objects.all().order_by('sr_number')
+        user_ = request.user.first_name
+        reg_form.saveFirst(user_)
+
+    else:
+        return render(request, 'reg_jounals/no_auth.html')
+    return redirect('/journals/sick_regs')
+
+def add_SickDocument(request, sr_number_):
+    if request.user.is_authenticated:
+        doc_form = SickDocument_form()
         if request.method == "POST":
-            tabel_form = Tabel_form(request.POST)
-            if tabel_form.is_valid():
-                tabel_form.saveFirst(year, month)
-    return render(request, 'reg_jounals/Tabel_add.html', context={'form':tabel_form, 'year':year, 'month':month, 'emps':emps})
+            doc_form = SickDocument_form(request.POST)
+            if doc_form.is_valid():
+                user_ = request.user.first_name
+                doc_form.saveFirst(user_, sr_number_)
+                loc = '/journals/sick_reg/'+str(sr_number_)+'/create/'
+                return redirect(loc)
+    else:
+        return render(request, 'reg_jounals/no_auth.html')
+    return render(request, 'reg_jounals/SickDocument_add.html', context={'form':doc_form, 'reg_num':sr_number_})
+
+def ItemDel_SickList(request, id):
+    if request.user.is_authenticated:
+        item = SickDocument.objects.get(id__iexact=id)
+        num = item.sd_reg_number
+        dest = '/journals/sick_reg/' + str(num) + '/create/'
+        item.delete()
+        return redirect(dest)
