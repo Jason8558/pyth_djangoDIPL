@@ -1,0 +1,38 @@
+{%extends "reg_jounals/index.html" %}
+
+{%block title%}Отчеты{%endblock%}
+{%block header%} <a class="btn btn-dark" href="../"> < назад </a> Отчеты  {%endblock%}
+<style>
+
+</style>
+{%block content%}
+<form action="">
+<h2><label for="rep_select">Вид отчета:  </label><select onchange="SelectRepType();" class=""  id="rep_select" name="rep_select">
+  <option value="OrdersOnOthers">Приказы на отпуск</option>
+  <option value="OrdersOnOthers">Приказы по другим вопросам</option>
+  <option value="OrdersOnOthers">Исходящие документы</option>
+  <option value="OrdersOnOthers">Приказы о командировках</option>
+  <option value="OrdersOnOthers">Приказы по личному составу</option>
+  <option value="OrdersOnOthers">Трудовые договоры</option>
+  <option value="OrdersOnOthers">Заявления на увольнение</option>
+  <option value="OrdersOnOthers">Заявления на прием</option>
+  <option value="OrdersOnOthers">Трудовые книжки</option>
+  <option value="OrdersOnOthers">По всем журналам</option>
+
+</select></h2>
+<div class="rep_params">
+<p>Параметры отчета:</p>
+<h4><label for="param_dur">Период с:</label><input type="date" class="" id="param_dur_from" name="param_dur_from"></input> <label for="param_dur_to">по:</label> <input type="date" id="param_dur_to" name="param_dur_to" value=""> <input type="submit" class="btn btn-dark" name="" value=""> </h4>
+<h4><label for="param_fio">ФИО:</label><input type="text" class="" id="param_fio" name="param_fio"></input></h4>
+<h4><label for="param_dep">Подразделение:</label><select class="" id="param_dep" name="param_dep">
+  {% for dep in deps %}
+  <option value="{{dep.dep_name}}">{{dep.dep_name}}</option>
+  {%endfor%}
+</select></h4>
+<input class="btn btn-dark" value="Сформировать отчет"type="submit">
+</form>
+</div>
+
+
+
+{%endblock%}

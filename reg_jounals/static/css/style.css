@@ -245,6 +245,8 @@ background: #977390;
   .page-link:focus {
     box-shadow: 0 0 0 0.2rem rgb(255 166 238) !important;
   }
+
+
 @media (max-width: 1088px) {
     .container {
       max-width: none !important;

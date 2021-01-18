@@ -632,3 +632,17 @@ def ItemDel_SickList(request, id):
         dest = '/journals/sick_reg/' + str(num) + '/create/'
         item.delete()
         return redirect(dest)
+
+def report_(request):
+    if request.user.is_authenticated:
+        report_type = request.GET.get('rep_select','')
+        report_duration_from = request.GET.get('param_dur_from', '')
+        report_duration_to = request.GET.get('param_dur_to', '')
+        report_fio = request.GET.get('param_fio','')
+         
+        deps = Departments.objects.all()
+        return render(request, 'reg_jounals/reports.html', context={'deps':deps})
+
+
+    else:
+        return render(request, 'no_auth.html')
