@@ -1,0 +1,40 @@
+{% extends 'TURV\index.html'%}
+
+{%block header%} <a class="btn btn-dark" href=".."> < Назад </a> | Табель учета рабочего времени за {{month}} {{year}}г. Всего человек в табеле: {{count}}.{%endblock%}
+
+{% block body %}
+
+<div class="container">
+  <a class="btn btn-success btn-add" href="{% url 'tabel_addItem_url' id=b_tabel.id%}">+ Добавить сотрудника в табель</a>
+<table>
+  <thead class="thead-dark">
+  <tr class="tr-header">
+
+
+    <th scope="col">ФИО</th>
+    <th scope="col">Должность</th>
+
+
+
+
+
+  </tr>
+  </thead>
+
+  {%for item in items %}
+
+
+
+<tr >
+
+    <td>{{item.employer}}</td>
+    <td>{{item.position}}</td>
+
+
+
+
+</tr>
+  {%endfor%}
+</table>
+</div>
+{%endblock%}

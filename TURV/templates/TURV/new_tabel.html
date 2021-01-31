@@ -1,0 +1,28 @@
+{% extends "TURV/index.html" %}
+
+{%block title%}Новый табель{% endblock %}
+{%block header%}Новый табель учета рабочего времени{% endblock %}
+
+{%block body%}
+
+
+<form class="add_form" action="" method="post">
+  {%csrf_token%}
+  <label for="t_dep">Подразделение</label>
+  <select onchange="ReReading()" name="t_dep" id="t_dep">
+    {% for dep in deps %}
+    <option value="{{dep.name}}">{{dep.name}}</option>
+  {%endfor%}
+  </select>
+
+
+{% for field in form %}
+{{field.label}}{{field}}
+{%endfor%}
+
+
+  <input class="btn btn-success" type="submit"  value="Добавить" />
+  <a class="btn btn-outline-danger" href="..">Отмена</a>
+</form>
+
+{%endblock%}

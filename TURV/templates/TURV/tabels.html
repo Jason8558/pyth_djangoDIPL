@@ -1,0 +1,40 @@
+{% extends 'TURV\index.html'%}
+
+{%block header%}Табели учета рабочего времени. Всего: {{count}}.{%endblock%}
+
+{% block body %}
+
+<div class="container">
+  <a class="btn btn-success btn-add" href="{% url 'new_tabel_url' %}">+ Новый табель</a>
+<table>
+  <thead class="thead-dark">
+  <tr class="tr-header">
+
+
+    <th scope="col">Период составления</th>
+    <th scope="col">Подразделение</th>
+    <th scope="col">Табельщик</th>
+
+
+
+
+  </tr >
+  </thead>
+
+  {%for tabel in tabels %}
+
+
+
+<tr onclick="return location.href = '{% url 'tabel_create_url' id=tabel.id%}' " >
+
+    <td>{{tabel.year}}{{tabel.month}}</td>
+    <td>{{tabel.department}}</td>
+    <td>{{tabel.res_officer}}</td>
+
+
+
+</tr>
+  {%endfor%}
+</table>
+</div>
+{%endblock%}
