@@ -1,0 +1,48 @@
+
+
+
+
+  @media print {
+
+* {
+  margin: 0 !important;
+}
+
+table {
+  float: left;
+}
+    .print-allow {
+      display: block;
+    }
+
+    @page {
+    	size: landscape
+    }
+
+body {
+  zoom: 67%;
+}
+
+
+  * {
+    font-size: 17pt;
+  }
+
+  .print {
+    display: none !important;
+  }
+
+  .print-allow {
+    display: block;
+  }
+
+  .tnumber {
+    padding: 0 6px;
+  }
+
+  .container {
+    max-width: 100% !important;
+  }
+
+
+  }

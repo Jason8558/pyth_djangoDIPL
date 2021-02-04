@@ -1,11 +1,17 @@
 {% extends 'TURV\index.html'%}
 
+{%block title%}Табели{% endblock %}
+
 {%block header%}Табели учета рабочего времени. Всего: {{count}}.{%endblock%}
 
 {% block body %}
 
 <div class="container">
-  <a class="btn btn-success btn-add" href="{% url 'new_tabel_url' %}">+ Новый табель</a>
+  <a class="btn btn-success btn-add"  href="{% url 'new_tabel_url' %}"  >+ Новый табель</a>
+
+
+{%if tabels%}
+
 <table>
   <thead class="thead-dark">
   <tr class="tr-header">
@@ -24,10 +30,13 @@
   {%for tabel in tabels %}
 
 
+  {% if tabel.del_check %}
+<tr style='background: red !important;' onclick="return location.href = '{% url 'tabel_create_url' id=tabel.id%}' " >
+  {%else%}
+<tr  onclick="return location.href = '{% url 'tabel_create_url' id=tabel.id%}' " >
+  {%endif%}
 
-<tr onclick="return location.href = '{% url 'tabel_create_url' id=tabel.id%}' " >
-
-    <td>{{tabel.year}}{{tabel.month}}</td>
+    <td><span class="field_month">{{tabel.month}}</span> {{tabel.year}}  </td>
     <td>{{tabel.department}}</td>
     <td>{{tabel.res_officer}}</td>
 
@@ -36,5 +45,8 @@
 </tr>
   {%endfor%}
 </table>
+{%else%}
+<h2>Табели не найдены</h2>
+{%endif%}
 </div>
 {%endblock%}

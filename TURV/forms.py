@@ -115,21 +115,30 @@ class TabelItem_form(forms.ModelForm):
 
         def saveFirst(self, bound_tabel):
             b_tabel = Tabel.objects.get(id=bound_tabel)
-
-            dep = b_tabel.department.name
+            emp = self.cleaned_data['employer'].id
+            print(emp)
+            dep = b_tabel.department
             year_ = b_tabel.year
             month = b_tabel.month
+            employer = Employers.objects.get(id = self.cleaned_data['employer'].id)
+            emp_name = employer.fullname
+            emp_position = employer.position
+            emp_level = employer.level
+            emp_PoP = employer.positionOfPayment
+
+
 
             new_item = TabelItem.objects.create(
 
             bound_tabel = bound_tabel,
-            employer = self.cleaned_data['employer'],
+            employer = employer,
+            
             year = year_,
             month = month,
             department = dep,
-            position = self.cleaned_data['position'],
-            level = self.cleaned_data['level'],
-            positionOfPayment = self.cleaned_data['position'],
+            position = emp_position,
+            level = emp_level,
+            positionOfPayment = emp_PoP,
             type_time1 = self.cleaned_data['type_time1'],
             type_time2 = self.cleaned_data['type_time2'],
             type_time3 = self.cleaned_data['type_time3'],
@@ -240,10 +249,10 @@ class TabelItem_form(forms.ModelForm):
 class Tabel_form(forms.ModelForm):
     class Meta:
         model = Tabel
-        fields = ['year', 'month', 'department']
+        fields = ['year', 'month', 'department', 'del_check']
 
     # department = forms.CharField(label=' ', widget=forms.Select(
-    #     attrs={'style': 'visibility:hidden;', 'type':'text'}))
+    #     attrs={ 'type':'text'}))
 
     def saveFirst(self, user_):
         new_tabel = Tabel.objects.create(

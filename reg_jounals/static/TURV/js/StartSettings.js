@@ -1,11 +1,102 @@
 $(document).ready(function(){
 
+
+dig_monts = $('.field_month')
+
+for (var i = 0; i < dig_monts.length; i++) {
+
+  switch (dig_monts[i].innerText) {
+    case '01':
+      dig_monts[i].textContent = 'Январь'
+    break;
+
+    case '02':
+      dig_monts[i].textContent = 'Февраль'
+    break;
+
+    case '03':
+      dig_monts[i].textContent = 'Март'
+    break;
+
+    case '04':
+      dig_monts[i].textContent = 'Апрель'
+    break;
+
+    case '05':
+      dig_monts[i].textContent = 'Май'
+    break;
+
+    case '06':
+      dig_monts[i].textContent = 'Июнь'
+    break;
+
+    case '07':
+      dig_monts[i].textContent = 'Июль'
+    break;
+
+    case '08':
+      dig_monts[i].textContent = 'Август'
+    break;
+
+    case '09':
+      dig_monts[i].textContent = 'Сентябрь'
+    break;
+
+    case '10':
+      dig_monts[i].textContent = 'Октябрь'
+    break;
+
+    case '11':
+      dig_monts[i].textContent = 'Ноябрь'
+    break;
+
+    case '12':
+      dig_monts[i].textContent = 'Декабрь'
+    break;
+}
+
+}
+
+//подставить подразделение
+
+    dep = $('#t_dep option:selected').val()
+
+    $("#id_department option").filter(function() {return this.text == dep;}).prop('selected', true);
+
+    var query = String(document.location.href).split('/');
+
+
+
+    if (query[4] != 'create') {
+    $('#id_month').val($('#t_month option:selected').val())
+    }
+
+
+//подставить сотрудника в табель
+
+    emp_ = $('#t_emps option:selected').val()
+
+    emp_s = emp_.split(',')
+
+    for (var i = 0; i < emp_s.length; i++) {
+      console.log(emp_s[i] + ' ' + i)
+        }
+    $('#fullname').text(emp_s[0])
+    $('#position').text('Должность: ' + emp_s[1])
+    $('#payment').text('Ступень оплаты: ' + emp_s[3])
+    $('#level').text('Разряд: ' + emp_s[2])
+    $('#id_employer').css('display','none')
+    $("#id_employer option").filter(function() {return this.text.split(',')[0] == emp_s[0];}).prop('selected', true);
+
+
+
+
+
   month_  = $('#id_month').text()
   year_ = $('#id_year').text()
   let rMonth = 0
 
-
-switch (month_) {
+  switch (month_) {
     case '01':
       rMonth = 0
     break;
@@ -53,8 +144,8 @@ switch (month_) {
     case '12':
       rMonth = 11
     break;
-
 }
+
 
 days_count = Date.getDaysInMonth(year_, rMonth)
 
@@ -95,8 +186,9 @@ let fDate = " "
 
 for (var i = 1; i < (days_count+1); i++) {
     fDate = (i.toString() + "." + month_.toString() + "." + year_)
+    console.log(fDate)
     pDate = Date.parse(fDate)
-
+    console.log(pDate)
     pDate = pDate.toString().split(" ")
 
     if (pDate[0] == 'Sat' || pDate[0] == 'Sun') {
@@ -342,7 +434,12 @@ for (var i = 1; i < (days_count+1); i++) {
 
 }
 
-})
+});
+
+function SetMonth() {
+  $('#id_month').val($('#t_month option:selected').val())
+
+}
 
 function ReSelect() {
 
@@ -352,6 +449,28 @@ function ReSelect() {
   $("#id_department option").filter(function() {return this.text == dep;}).prop('selected', true);
 
 
+}
+
+function ReSelectEmp() {
+emp_ = $('#t_emps option:selected').val()
+
+emp_s = emp_.split(',')
+
+for (var i = 0; i < emp_s.length; i++) {
+  console.log(emp_s[i] + ' ' + i)
+}
+$('#fullname').text(emp_s[0])
+$('#position').text('Должность: ' + emp_s[1])
+$('#payment').text('Ступень оплаты: ' + emp_s[3])
+if (emp_s[2] != " ") {
+  $('#level').text('Разряд: ' + emp_s[2])
+} else {
+$('#level').text('')
+}
+
+
+
+  $("#id_employer option").filter(function() {return this.text.split(',')[0] == emp_s[0];}).prop('selected', true);
 }
 
 function Tabel() {
