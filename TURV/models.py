@@ -2,12 +2,16 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Employers(models.Model):
+    sex_choices = [('М','М'),('Ж','Ж')]
     fullname = models.CharField(verbose_name = 'ФИО сотрудника', db_index=True, max_length=256)
+    sex = models.CharField(verbose_name = 'Пол', choices=sex_choices, db_index=True, max_length=1, default="М")
     position = models.ForeignKey('Position', verbose_name='Должность', db_index=True, on_delete=models.CASCADE)
-
-    department = models.ForeignKey('Department', verbose_name='Подразделение', db_index=True, on_delete=models.CASCADE)
+    shift_personnel = models.BooleanField(verbose_name='Сменный персонал', default=False)
+    fired = models.BooleanField(verbose_name='Сотрудник уволен', default=False)
+    stand_worktime = models.FloatField(verbose_name='Норма часов', default=0)
+    department = models.ForeignKey('Department', verbose_name='Подразделение', on_delete=models.CASCADE)
     level = models.CharField(verbose_name='Разряд/категория', max_length=256)
-    positionOfPayment = models.CharField(verbose_name='Ступень оплаты', max_length=2)
+    positionOfPayment = models.CharField(verbose_name='Ступень оплаты', max_length=3)
 
     class Meta:
         ordering = ['fullname']
@@ -15,12 +19,12 @@ class Employers(models.Model):
         verbose_name_plural = 'Сотрудники'
 
     def __str__(self):
-        return  self.fullname + ', ' + str(self.position) + ', ' + str(self.level) + ', ' + str(self.positionOfPayment) + ', ' + str(self.id)
+        return  self.fullname + ',' + str(self.position) + ',' + str(self.level) + ',' + str(self.positionOfPayment) + ',' + str(self.id) + ',' + str(self.shift_personnel) + ',' + str(self.stand_worktime)
         # return self.fullname
 
 class Department(models.Model):
     name = models.CharField(verbose_name = 'Название подразделения', db_index=True, max_length=256)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name = 'Табельщик')
+    user = models.ManyToManyField(User, verbose_name = 'Табельщик')
 
     class Meta:
         ordering = ['name']
@@ -42,10 +46,13 @@ class Position(models.Model):
         return self.name
 
 class Tabel(models.Model):
-    year = models.CharField(verbose_name='Год', db_index=True, max_length=256)
+    year = models.CharField(verbose_name='Год', db_index=True, max_length=4)
     month = models.CharField(verbose_name='Месяц', db_index=True, max_length=256)
     department = models.ForeignKey('Department', verbose_name=' ', db_index=True, on_delete=models.CASCADE)
     del_check = models.BooleanField(verbose_name='Пометка удаления', default=False, blank=True)
+    sup_check = models.BooleanField(verbose_name='Проверен СУП', default=False, blank=True)
+    unloaded =  models.BooleanField(verbose_name='Загружен в 1С', default=False, blank=True)
+    # ro_check = models.BooleanField(verbose_name='Проверен РО', default=False, blank=True)
     res_officer = models.CharField(blank=True, editable=False,  max_length=256, help_text="Отвественный за составление табеля", verbose_name='Табельщик')
     class Meta:
         ordering = ['-year']
@@ -56,15 +63,10 @@ class Tabel(models.Model):
         return str(self.department) + str(self.month) + str(self.year)
 
 class TabelItem(models.Model):
-    bound_tabel = models.CharField(max_length=256, db_index=True, default='None', verbose_name='Связанный табель')
+    bound_tabel = models.ForeignKey('Tabel', verbose_name='Св. табель', db_index=True, on_delete=models.CASCADE)
     employer = models.ForeignKey('Employers', verbose_name='Сотрудник', db_index=True, on_delete=models.CASCADE)
-    category = models.CharField(verbose_name = 'Категория стат. учета', db_index=True, max_length=256, default="спец.")
     year = models.CharField(verbose_name='Год', db_index=True, max_length=256)
     month = models.CharField(verbose_name='Месяц', db_index=True, max_length=256)
-    department = models.ForeignKey('Department', verbose_name='', db_index=True, on_delete=models.CASCADE)
-    position = models.ForeignKey('Position', verbose_name='Должность', db_index=True, on_delete=models.CASCADE, blank=True, null=True)
-    level = models.CharField(verbose_name='Разряд', max_length=2, blank=True, null=True)
-    positionOfPayment = models.CharField(verbose_name='Ступень оплаты', max_length=2, blank=True, null=True)
 
 # Виды времени
     type_time1 = models.CharField(max_length=4, verbose_name='Вид времени1', null = True, blank=True)
@@ -133,10 +135,10 @@ class TabelItem(models.Model):
     hours31 = models.CharField(max_length=4, verbose_name='Часы31', null = True, blank=True)
 
 #Итоги видов времени
-    sHours1 = models.IntegerField(verbose_name='Явки (Я)', help_text='Явки', null = True, blank=True)
+    sHours1 = models.FloatField(verbose_name='Явки (Я)', help_text='Явки', null = True, blank=True)
     sHours2 = models.IntegerField(verbose_name='Ночные (Н)', null = True, blank=True)
     sHours3 = models.IntegerField(verbose_name='Работа в выходные и празд. (РВ)', null = True, blank=True)
-    sHours4 = models.IntegerField(verbose_name='Сверхурочные (С)', null = True, blank=True)
+    sHours4 = models.FloatField(verbose_name='Сверхурочные (С)', null = True, blank=True)
     sHours5 = models.IntegerField(verbose_name='Вахтовый метод (ВМ)', null = True, blank=True)
     sHours6 = models.IntegerField(verbose_name='Служебная командировка (К)', null = True, blank=True)
     sHours7 = models.IntegerField(verbose_name='Повыш. квалификации с отрывом от работы (ПК)', null = True, blank=True)
@@ -167,10 +169,16 @@ class TabelItem(models.Model):
     sHours32 = models.IntegerField(verbose_name='Оплачиваемое отстранение от работы (НО)', null = True, blank=True)
     sHours33 = models.IntegerField(verbose_name='Неоплачиваемое отстранение от работы (НБ)', null = True, blank=True)
     sHours34 = models.IntegerField(verbose_name='Остановка работы про причине невыплаты ЗП (НЗ)', null = True, blank=True)
+    sHours35 = models.IntegerField(verbose_name='Совмещение', null = True, blank=True)
+    sHours36 = models.IntegerField(verbose_name='Местная командировка', null = True, blank=True)
+    sHours37 = models.IntegerField(verbose_name='Пенсионный', null = True, blank=True)
+    sHours38 = models.IntegerField(verbose_name='Нерабочие оплачиваемые дни', null = True, blank=True)
     w_days = models.IntegerField(verbose_name='Дней отработано', default=0, null = True, blank=True)
-    w_hours = models.IntegerField(verbose_name='Часов отработано', default=0, null = True, blank=True)
+    # w_hours = models.IntegerField(verbose_name='Часов отработано', default=0, null = True, blank=True)
+    w_hours = models.FloatField(verbose_name='Часов отработано', default=0, null = True, blank=True)
     v_days = models.IntegerField(verbose_name='Дней неявок', default=0, null = True, blank=True)
-    v_hours = models.IntegerField(verbose_name='Часов неявок', default=0, null = True, blank=True)
+    # v_hours = models.IntegerField(verbose_name='Часов неявок', default=0, null = True, blank=True)
+    v_hours = models.FloatField(verbose_name='Часов неявок', default=0, null = True, blank=True)
 
     class Meta:
         ordering = ['-year']
@@ -180,3 +188,17 @@ class TabelItem(models.Model):
     def __str__(self):
         doc_fullname = str(self.employer) + ' ' + str(self.month) + '  ' + str(self.year)
         return doc_fullname
+
+class Overtime(models.Model):
+    year = models.DateField(verbose_name='Период', db_index=True)
+    value_m = models.FloatField(verbose_name='Значение_мужчины', default=0)
+    value_w = models.FloatField(verbose_name='Значение_женщины', default=0)
+
+    class Meta:
+        ordering = ['-year']
+        verbose_name = 'Норма времени'
+        verbose_name_plural = 'Нормы врмени'
+
+    def __str__(self):
+        fullname = str(self.year)
+        return fullname

@@ -1,75 +1,253 @@
-{% extends 'TURV\index.html'%}
+{% extends 'TURV/index.html'%}
+{%load static%}
 {%block title%}{{b_tabel.department}} {{month}} {{year}}{%endblock%}
-{%block header%} <a class="btn btn-dark" href=".."> < Назад </a> | <span id="id_month" class="">{{month}}</span> <span id="id_year" class="">{{year}}</span> Табель учета рабочего времени <span><b>{{b_tabel.department}}</b></span> за: <b><span class="field_month">{{month}}</span> {{year}} г.</b> Всего человек в табеле: {{count}}.{%endblock%}
+
+{%block header%}
+<a class="btn btn-danger" onclick="window.close()"> ЗАКРЫТЬ  </a> |
+<span id="id_month" class="not-print" style="display:none">{{month}}</span>
+<span id="id_year" class="not-print" style="display:none">{{year}}</span>
+
+Табель учета рабочего времени
+<span><b>{{b_tabel.department}}</b></span>
+за: <b><span class="field_month">{{month}}</span> {{year}} г.</b>
+Всего сотрудников в табеле: {{count}}
+
+{%endblock%}
+
+{%block scripts%}
+  <script src="{% static 'TURV\js\Eighties5.js' %}" charset="utf-8"></script>
+  <script src="{% static 'TURV\js\printtabel7.js' %}" charset="utf-8"></script>
+  <script src="{% static 'TURV\js\cookie.js' %}" charset="utf-8"></script>
+    <link rel="stylesheet" href="{% static 'TURV\css\printwarning.css'%}">
+  {%endblock%}
 
 {% block body %}
 
-<div class="container tabel_container">
-  <form class="print" action="" method="post">
-    {%csrf_token%}
+<!-- <link rel="stylesheet" href="{% static 'TURV\css\tabel_print2.css'%}"> -->
 
 
-<div class="hide">
-  {{form.month}}
-  {{form.year}}
-  {{form.department}}
+<form action="" class="f_search intabel not-print">
+<p>ПОИСК</p>
+<input type="text" name="its_employer"  placeholder="поиск по ФИО" value="">
+<select class="" name="its_position">
+<option value="">Поиск по должности</option>
+{% for pos in positions%}
+<option value="{{pos}}">{{pos}}</option>
+{%endfor%}
+</select>
+<input type="submit" name="" class="btn btn-dark" value="Найти">
+<a class="btn btn-outline-danger" href="/turv/create/{{b_tabel.id}}">Сбросить поиск</a>
+</form>
+
+<!-- <div class="alert alert-danger not-print " >
+<p><b>ВНИМАНИЕ! ИЗМЕНИЛИСЬ НАСТРОЙКИ ПЕЧАТИ! В БРАУЗЕРЕ FIREFOX МАСШТАБ: 85, CHROME: 100. ПОЛЯ ВЕЗДЕ: По умолчанию. Вопросы по т. 2035</b></p>
+</div> -->
+
+
+<div  class="container tabel_container">
+<!-- <h5 class="not-print" style="color:red;">ВАЖНО: ПЕЧАТЬ ТАБЕЛЯ ВРЕМЕННО ОСУЩЕСТВЛЯЕТСЯ СЛУЖБОЙ УПРАВЛЕНИЯ ПЕРСОНАЛОМ! ЕСЛИ ВАШ ТАБЕЛЬ ГОТОВ К ПЕЧАТИ, ПОЗВОНИТЕ В СУП И СООБЩИТЕ ОБ ЭТОМ</h5> -->
+<div class="for-print not-screen cover">
+
+<div class="colon">
+<p>Унифицированная форма № Т-12</p>
+<p>Утверждена Постановлением Госкомстата</p>
+<p>России от 05.01.2004 № 1</p>
 </div>
-  <label for="del_check">Пометка удаления</label> {{form.del_check}} <input class="btn btn-outline-danger btn-sm" type="submit" name="" value="ПОДТВЕРДИТЬ">
-  </form>
+
+<div class="cover_dep">
+<h3 style="border-bottom: 1px solid black; " class="b-bottom">КГУП "Камчатский водоканал"</h3>
+<p>(наименование организации)</p>
+
+
+<h3 class="b-bottom" style="border-bottom: 1px solid black; font-size: 30px;" id='c_dep'>{{b_tabel.department}}</h3>
+<p>(наименование подразделения)</p>
+</div>
+
+<div class="cover_middle">
+<div class="cover_head">
+<h2>ТАБЕЛЬ</h2>
+<h3>учета рабочего времени и расчета оплаты труда</h3>
+<h2>УСЛОВНЫЕ ОБОЗНАЧЕНИЯ</h2>
+</div>
+
+<div class="cover-tables">
+<table class="cover_period">
+<thead>
+<tr>
+<th colspan="2">Отчетный период</th>
+
+</tr>
+
+<tr>
+<th>с</th>
+<th>по</th>
+</tr>
+<tbody>
+<td id="cover_from"> </td>
+<td id="cover_to"> </td>
+</tbody>
+</thead>
+</table>
+<table class="cover_number">
+<thead>
+<tr>
+<th>Номер документа</th>
+<th>Дата составления</th>
+</tr>
+<tbody>
+<td> </td>
+<td id="cover_today"> </td>
+</tbody>
+</thead>
+</table>
+</div>
+<img src="{% static 'TURV\img\legend.jpg'%}" alt="">
+</div>
+</div>
+<h5 class="not-print" style="color:red;">ВАЖНО: ПЕРЕД ПЕЧАТЬЮ ТАБЕЛЯ ОБЯЗАТЕЛЬНО ОЗНАКОМТЕСЬ С <span><a style="float: none; margin-left: none;" href="https://docs.google.com/document/d/1Z439AZgEkRSZErC1wrBpQE9ajGD-OPZIZOkNI08mPSg/edit#heading=h.g1x2nyrk0y8c">ИНСТРУКЦИЕЙ,</a></span> ПРОВЕРЬТЕ НАСТРОЙКИ ПЕЧАТИ, А ТАК ЖЕ ПРОВЕРЬТЕ КОРРЕКТНОСТЬ СФОРМИРОВАННОГО ДОКУМЕНТА В ОКНЕ ПРЕДВАРИТЕЛЬНОГО ПРОСМОТРА </h5>
+<div class="sup_check not-print">
+  {% if b_tabel.sup_check %}
+    {% if granted == 1%}
+    <a class="btn btn-danger" href="{% url 'checked' id=b_tabel.id%}">Отменить проверку</a>
+    {%endif%}
+    <h4 style="color: green;">✅ Проверен СУП</h4>
+    {%else%}
+    {% if granted == 1%}
+    <a class="btn btn-success" href="{% url 'checked' id=b_tabel.id%}">Отметить как проверенный</a>
+    {%endif%}
+{%endif%}
+
+<input class="btn btn-warning"  style="margin-left: 6px;" type="button" name="" onclick="print()" value="ПЕЧАТЬ">
+
+</div>
   {% if form.errors %}
   {{form.errors}}
   {%endif%}
 
-  {% if b_tabel.del_check %}
+  {% if b_tabel.sup_check %}
+    <h2 style="color:green; text-decoration: underline;" class="not-print">Табель проверен, внесение изменений невозможно</h2>
   {% else %}
-  <a class="btn btn-success btn-add print" href="{% url 'tabel_addItem_url' id=b_tabel.id%}">+ Добавить сотрудника в табель</a>
+  <a class="btn btn-success btn-add not-print" href="{% url 'tabel_addItem_url' id=b_tabel.id%}">+ Добавить сотрудника в табель</a>
   {% endif %}
 
 {% if items %}
-<table  cellpadding="2" cellspacing="0">
-  <thead class="thead-dark">
+
+<div class="headcopy not-print" style="display:none">
+  <table style=" font-size: 8pt !important">
+
+
+  <thead style="display: table-header-group" class="thead-dark">
   <tr class="tr-header">
 
-
-    <th>ФИО</th>
-    <th >Должность</th>
-    <th >Разряд</th>
-    <th >Ступень</th>
+    <th  rowspan="2">№</th>
+    <th colspan="3" style="display:none;">ФИО | долж. | разр.</th>
+    <th >ФИО</th>
+    <th >Должн.</th>
+    <th  >Раз.</th>
+    <th >Ст.</th>
     <th>1</th>
-    <th>2</th>
+    <th >2</th>
     <th>3</th>
-    <th>4</th>
-    <th>5</th>
-    <th>6</th>
-    <th>7</th>
-    <th>8</th>
-    <th>9</th>
-    <th>10</th>
-    <th>11</th>
-    <th>12</th>
-    <th>13</th>
+    <th >4</th>
+    <th >5</th>
+    <th >6</th>
+    <th >7</th>
+    <th >8</th>
+    <th >9</th>
+    <th >10</th>
+    <th >11</th>
+    <th >12</th>
+    <th >13</th>
     <th>14</th>
-    <th>15</th>
-    <th>16</th>
-    <th>17</th>
-    <th>18</th>
-    <th>19</th>
-    <th>20</th>
-    <th>21</th>
-    <th>22</th>
-    <th>23</th>
-    <th>24</th>
-    <th>25</th>
-    <th>26</th>
-    <th>27</th>
-    <th>28</th>
-    <th class="day29">29</th>
+    <th >15</th>
+    <th >16</th>
+    <th >17</th>
+    <th >18</th>
+    <th >19</th>
+    <th >20</th>
+    <th >21</th>
+    <th >22</th>
+    <th >23</th>
+    <th >24</th>
+    <th >25</th>
+    <th >26</th>
+    <th >27</th>
+    <th >28</th>
+    <th class="day29 ">29</th>
     <th class="day30">30</th>
-    <th class="day31">31</th>
-    <th>Отработано дней</th>
-    <th>Отработано часов</th>
-    <th>Дней неявок</th>
-    <th>Из них по причинам</th>
+    <th class="day31 ">31</th>
+    <th >Дни.</th>
+    <th>Час./ЛЧ</th>
+    <th >Св.</th>
+    <th >НЧ</th>
+    <th >в./пр.</th>
+    <th >Сов.</th>
+    <th >Нея.</th>
+    <th >Из них</th>
+    <th  >Вых.</th>
+
+
+
+
+
+
+
+  </tr>
+  </thead>
+  </table>
+</div>
+
+<table id="t_tabel" class="tabel" style="display: none" cellpadding="0.5" cellspacing="1">
+
+  <thead style="display: table-header-group" class="thead-dark" id="tabel_head">
+  <tr class="tr-header">
+
+    <th class=" num " rowspan="2">№</th>
+    <th class="for-print  fio " colspan="3">ФИО|долж.|разр.</th>
+    <th class="not-print fio-screen ">ФИО</th>
+    <th class="not-print pos-screen" >Должн.</th>
+    <th class="not-print " >Раз.</th>
+    <th class="thin-itogo">Ст.</th>
+    <th class="head-hours">1</th>
+    <th class="head-hours">2</th>
+    <th class="head-hours">3</th>
+    <th class="head-hours">4</th>
+    <th class="head-hours">5</th>
+    <th class="head-hours">6</th>
+    <th class="head-hours">7</th>
+    <th class="head-hours">8</th>
+    <th class="head-hours">9</th>
+    <th class="head-hours">10</th>
+    <th class="head-hours">11</th>
+    <th class="head-hours">12</th>
+    <th class="head-hours">13</th>
+    <th class="head-hours">14</th>
+    <th class="head-hours">15</th>
+    <th class="head-hours">16</th>
+    <th class="head-hours">17</th>
+    <th class="head-hours">18</th>
+    <th class="head-hours">19</th>
+    <th class="head-hours">20</th>
+    <th class="head-hours">21</th>
+    <th class="head-hours">22</th>
+    <th class="head-hours">23</th>
+    <th class="head-hours">24</th>
+    <th class="head-hours">25</th>
+    <th class="head-hours">26</th>
+    <th class="head-hours">27</th>
+    <th class="head-hours">28</th>
+    <th class="day29 head-hours">29</th>
+    <th class="day30 head-hours">30</th>
+    <th class="day31 head-hours">31</th>
+    <th class="thin-itogo">Дни.</th>
+    <th class="wide-itogs">Час./ЛЧ</th>
+    <th class="wide-itogs">Св.</th>
+    <th class="thin-itogo">НЧ</th>
+    <th class="thin-itogo">в./пр.</th>
+    <th class="thin-itogo">Сов.</th>
+    <th class="thin-itogo">Нея.</th>
+    <th class="include">Из них</th>
+    <th class="thin-itogo" >Вых.</th>
 
 
 
@@ -85,16 +263,24 @@
 
 
 
+    {% if b_tabel.sup_check %}
+    <tr id="{{item.id}}" onmouseleave="row_highlight_off({{item.id}})" onmouseover="row_highlight({{item.id}})" class="time_types">
+    {%else%}
+      <tr id="{{item.id}}"  onmouseleave="row_highlight_off({{item.id}})" onclick="return location.href = '{% url 'tabel_updItem_url' id=item.id%}' "  onmouseover="row_highlight({{item.id}})" class="time_types">
+    {%endif%}
+      <th class="print-num cell_bb" rowspan="2"></th>
+      <td  class="for-print cell_bb fio" rowspan="2" colspan="3">{{item.employer.fullname}}|{{item.employer.position|truncatechars:10}}|{{item.employer.level}}</td>
 
-    <tr class="time_types">
-      <td rowspan="2">{{item.employer.fullname}}</td>
-      <td rowspan="2">{{item.position}}</td>
-      <td rowspan="2">{{item.level}}</td>
-      <td rowspan="2">{{item.positionOfPayment}}</td>
+      <td class="not-print cell_bb" rowspan="2">{{item.employer.fullname}}</td>
+      <td class="not-print cell_bb" rowspan="2">{{item.employer.position}}</td>
+      <td class="not-print cell_bb" rowspan="2">{{item.employer.level}}</td>
+      <td rowspan="2" class="cell_bb">{{item.employer.positionOfPayment}}</td>
       <td class="cell_ttime">{{item.type_time1}}</td>
       <td class="cell_ttime">{{item.type_time2}}</td>
       <td class="cell_ttime">{{item.type_time3}}</td>
+
       <td class="cell_ttime">{{item.type_time4}}</td>
+
       <td class="cell_ttime">{{item.type_time5}}</td>
       <td class="cell_ttime">{{item.type_time6}}</td>
       <td class="cell_ttime">{{item.type_time7}}</td>
@@ -122,13 +308,42 @@
       <td class="cell_ttime  day29 ">{{item.type_time29}}</td>
       <td class="cell_ttime day30 ">{{item.type_time30}}</td>
       <td class="cell_ttime day31">{{item.type_time31}}</td>
-      <td rowspan="2">{{item.w_days}}</td>
+      <td rowspan="2" class="cell_bb">{{item.w_days}}</td>
       {% if item.sHours19 != 0 %}
-      <td rowspan="2">{{item.w_hours}}/{{item.sHours19}}</td>
+      <td rowspan="2" class="cell_bb wide-itogs">{{item.w_hours|floatformat:-2}}/{{item.sHours19}}</td>
       {%else%}
-      <td rowspan="2">{{item.w_hours}}</td>
+      <td rowspan="2" class="cell_bb wide-itogs">{{item.w_hours|floatformat:-2}}</td>
         {%endif%}
-      <td rowspan="2">{{item.v_days}}</td>
+
+      {% if item.sHours4 > 0 %}
+      <td rowspan="2"class="cell_bb wide-itogs">{{item.sHours4|floatformat:2}}</td>
+      {% else %}
+        <td rowspan="2" class="cell_bb"></td>
+      {%endif%}
+
+      {%if item.sHours2 %}
+        <td rowspan="2" class="cell_bb">{{item.sHours2}}</td>
+      {%else%}
+        <td rowspan="2" class="cell_bb"></td>
+      {%endif%}
+      {%if item.sHours3 %}
+        <td rowspan="2" class="cell_bb">{{item.sHours3}}</td>
+      {%else%}
+        <td rowspan="2" class="cell_bb"></td>
+      {%endif%}
+
+      {%if item.sHours35 %}
+        <td rowspan="2" class="cell_bb">{{item.sHours35}}</td>
+      {%else%}
+        <td rowspan="2" class="cell_bb"></td>
+        {%endif%}
+      {% if item.v_days > 0%}
+        <td rowspan="2" class="cell_bb">{{item.v_days}}</td>
+      {%else%}
+        <td rowspan="2" class="cell_bb"></td>
+      {%endif%}
+      <td rowspan="2"class="vac-include cell_bb" ></td>
+      <td rowspan="2" class="weekends cell_bb">{{item.sHours24}}</td>
 
 
 
@@ -137,11 +352,14 @@
 
 
     </tr>
-    <tr>
+
+<tr id="{{item.id}}_1">
+
 
         <td class="cell_hours">{{item.hours1}}</td>
         <td class="cell_hours">{{item.hours2}}</td>
         <td class="cell_hours">{{item.hours3}}</td>
+
         <td class="cell_hours">{{item.hours4}}</td>
         <td class="cell_hours">{{item.hours5}}</td>
         <td class="cell_hours">{{item.hours6}}</td>
@@ -181,6 +399,56 @@
 
 
   {%endfor%}
+  <tr style="font-weight: bold;">
+
+    <td class="for-print"></td>
+    <td colspan="3">ИТОГО</td>
+
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td class="day29"></td>
+    <td class="day30"></td>
+    <td class="day31"></td>
+    <td>{{s_days}}</td>
+    <td>{{s_hours}}\{{s_lhours}}</td>
+    <td>{{s_over|floatformat:2}}</td>
+    <td>{{s_night}}</td>
+    <td>{{s_vacwork}}</td>
+    <td></td>
+    <td>{{s_vac}}</td>
+    <td></td>
+    <td>{{s_weekends}}</td>
+
+
+
+  </tr>
 </table>
 {%else%}
   {% if b_tabel.del_check%}
@@ -189,5 +457,14 @@
     <h2>Сотрудников нет</h2>
   {%endif%}
 {%endif%}
+
+<div class="cover-footer for-print" >
+<h3>Ответственный за составление табеля ________________________________________________________________________________________ __.__.20__ г.</h3>
+<h3>Руководитель структурного подразделения ________________________________________________________________________________________ __.__.20__ г..</h3>
+<h3>Специалист СУП ________________________________________________________________________________________ __.__.20__ г..</h3>
+</div>
+</div>
+<div style="display:none" class="print_warning">
+  <h1 style="color:red;">ДЛЯ ПЕЧАТИ ТАБЕЛЯ НАЖМИТЕ ЖЕЛТУЮ КНОПКУ ПЕЧАТЬ, КОТОРАЯ НАХОДИТСЯ ВЫШЕ ОСНОВНОЙ ТАБЛИЦЫ ТАБЕЛЯ!</h1>
 </div>
 {%endblock%}

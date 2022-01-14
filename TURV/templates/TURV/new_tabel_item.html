@@ -1,18 +1,73 @@
-{% extends "TURV\index.html" %}
-
+{% extends "TURV/index.html" %}
+{%load static%}
+{%block scripts%}<script src="{% static 'TURV\js\TabelItemAdd3.js' %}" charset="utf-8"></script>{%endblock%}
 {%block title%}Заполнение сотрудника{%endblock%}
 
-{%block header%}<span class="hide" id="id_month">{{month}}</span>Табель за <span  class='field_month'>{{month}}</span> <span id='id_year'>{{year}}</span> г. - <h5 id="fullname"></h5>{%endblock%}
+{%block header%}<a class="btn btn-dark" href="/turv/create/{{b_tabel.id}}">< Назад</a> | <span class="hide" id="id_month">{{month}}</span>Табель за <span  class='field_month'>{{month}}</span> <span id='id_year'>{{year}}</span> г.{%endblock%}
 
 {%block body%}
-<div class="container">
+<div class="alert alert-danger errors" role="alert">
 
-
-<div class="t_peoples">
-  <table>
-
-  </table>
 </div>
+<div class=" hide intabel">
+
+  {% for item in in_tabel %}
+  <li class="intabel_pos" id="{{item.employer.id}}">{{item.employer.fullname}}|{{item.employer.id}}</li>
+  {%endfor%}
+</div>
+<div class="container titem">
+
+
+
+<div class="indep">
+
+<ul>
+  {% for emp in emps %}
+  {% if emp.fired%}
+  {%else%}
+  <li id={{emp.id}}>{{emp.fullname}}|{{emp.position}}|{{emp.level}}|{{emp.positionOfPayment}}|<span class="posid" style="color:white">{{emp.id}}</span></li>
+  {%endif%}
+  {%endfor%}
+</ul>
+</div>
+
+
+<div id="tabel_item" class="tabel_item">
+
+ <!-- <ul class="in_tabel_list">
+   {% for emp in in_tabel %}
+   <li>{{emp.employer}}</li>
+   {%endfor%}
+ </ul> -->
+<!-- <div class="in_tabel_list">
+<table>
+  <thead>
+    <tr>
+      <th>ФИО</th>
+      <th>Должность</th>
+      <th>Разряд</th>
+      <th>Ст. оплаты</th>
+    </tr>
+  </thead>
+  <tbody>
+     {% for emp in in_tabel %}
+    <tr>
+      <td>{{emp.employer.fullname}}</td>
+      <td>{{emp.employer.position}}</td>
+      <td>{{emp.employer.level}}</td>
+      <td>{{emp.employer.positionOfPayment}}</td>
+    </tr>
+    {%endfor%}
+  </tbody>
+</table>
+</div> -->
+
+  <div class="t_peoples hide">
+
+
+  {{tabel.department}}
+
+  </div>
 
 {% if tabel.errors%}
 
@@ -28,33 +83,44 @@
 
 
   <div class="nt_body_employer">
-    {{tabel.employer.label}}
-    <select class="" id='t_emps' onchange="ReSelectEmp()" name="t_emps">
+    <h4>Выберите сотрудника из списка: (фио, должность, разряд): </h4>
+    <select class="chosen-select" id='t_emps' onchange="ReSelectEmp()" name="t_emps">
       {% for emp in emps%}
-      <option value="{{emp}}">{{emp}}</option>
+        {% if emp.fired %}
+        {%else%}
+      <option id="{{emp.id}}" value="{{emp.id}}">{{emp.fullname}}, {{emp.position}}, {{emp.level}}, {% if emp.shift_personnel %} Смен. {% else %} Днев. {%endif%}</option>
+      {%endif%}
       {%endfor%}
     </select>
+    <a href="{% url 'emp_new'%}" target="_blank" class="btn btn-outline-info "> + новый сотрудник </a>
+
     {{tabel.employer}}
 
   </div>
 <div class="nt_text_employer">
-  <div>
+  <div class="nt_emp_info">
   <h5 id="fullname"></h5>
   <h5 id="position"></h5>
   <h5 id="level"></h5>
   <h5 id="payment"></h5>
+  <h5 id="shift"></h5>
+  <span id="n_time_span">Норма времени</span><h5 id="n_time"></h5>
   </div>
 
   <div class="results">
-    <p>{{tabel.w_days.label}}{{tabel.w_days}}</p>
-    <p>{{tabel.w_hours.label}}{{tabel.w_hours}}</p>
-    <p>{{tabel.v_days.label}}{{tabel.v_days}}</p>
-    <p>{{tabel.v_hours.label}}{{tabel.v_hours}}</p>
+    <p><span>{{tabel.w_days.label}}</span>{{tabel.w_days}}</p>
+    <p><span>{{tabel.w_hours.label}}</span>{{tabel.w_hours}}</p>
+    <p><span>{{tabel.v_days.label}}</span>{{tabel.v_days}}</p>
+    <p><span>{{tabel.sHours35.label}}</span>{{tabel.sHours35}}</p>
+    <p><span>{{tabel.sHours4.label}}</span>{{tabel.sHours4}}</p>
+    <p><label style="color: blue;" for="manual_overwork">Ввести сверхурочные вручную</label><input type="checkbox" id="manover" name="manual_overwork" value=""></p>
+    <p><span><label for="weekends">Выходных дней</label></span><input id="weekends" type="number" readonly name="weekends" value=""></p>
   </div>
 </div>
-<button type="button" onclick="Tabel();" class="btn btn-outline-dark" name="button">Расчитать</button>
-<input type="submit" class="btn btn-success" name="" value="Добавить">
+
   <div class="nt_body_times">
+    <div class="first_half">
+
     <span>1</span>
     <span>2</span>
     <span>3</span>
@@ -70,6 +136,42 @@
     <span>13</span>
     <span>14</span>
     <span>15</span>
+    {{tabel.type_time1}}
+    {{tabel.type_time2}}
+    {{tabel.type_time3}}
+    {{tabel.type_time4}}
+    {{tabel.type_time5}}
+    {{tabel.type_time6}}
+    {{tabel.type_time7}}
+    {{tabel.type_time8}}
+    {{tabel.type_time9}}
+    {{tabel.type_time10}}
+    {{tabel.type_time11}}
+    {{tabel.type_time12}}
+    {{tabel.type_time13}}
+    {{tabel.type_time14}}
+    {{tabel.type_time15}}
+
+    {{tabel.hours1}}
+    {{tabel.hours2}}
+    {{tabel.hours3}}
+    {{tabel.hours4}}
+    {{tabel.hours5}}
+    {{tabel.hours6}}
+    {{tabel.hours7}}
+    {{tabel.hours8}}
+    {{tabel.hours9}}
+    {{tabel.hours10}}
+    {{tabel.hours11}}
+    {{tabel.hours12}}
+    {{tabel.hours13}}
+    {{tabel.hours14}}
+    {{tabel.hours15}}
+
+</div>
+
+<div class="second_half">
+
     <span>16</span>
     <span>17</span>
     <span>18</span>
@@ -86,21 +188,7 @@
     <span id="day29">29</span>
     <span id="day30">30</span>
     <span id="day31">31</span>
-    {{tabel.type_time1}}
-    {{tabel.type_time2}}
-    {{tabel.type_time3}}
-    {{tabel.type_time4}}
-    {{tabel.type_time5}}
-    {{tabel.type_time6}}
-    {{tabel.type_time7}}
-    {{tabel.type_time8}}
-    {{tabel.type_time9}}
-    {{tabel.type_time10}}
-    {{tabel.type_time11}}
-    {{tabel.type_time12}}
-    {{tabel.type_time13}}
-    {{tabel.type_time14}}
-    {{tabel.type_time15}}
+
     {{tabel.type_time16}}
     {{tabel.type_time17}}
     {{tabel.type_time18}}
@@ -118,21 +206,7 @@
     {{tabel.type_time30}}
     {{tabel.type_time31}}
 
-    {{tabel.hours1}}
-    {{tabel.hours2}}
-    {{tabel.hours3}}
-    {{tabel.hours4}}
-    {{tabel.hours5}}
-    {{tabel.hours6}}
-    {{tabel.hours7}}
-    {{tabel.hours8}}
-    {{tabel.hours9}}
-    {{tabel.hours10}}
-    {{tabel.hours11}}
-    {{tabel.hours12}}
-    {{tabel.hours13}}
-    {{tabel.hours14}}
-    {{tabel.hours15}}
+
     {{tabel.hours16}}
     {{tabel.hours17}}
     {{tabel.hours18}}
@@ -150,37 +224,43 @@
     {{tabel.hours30}}
     {{tabel.hours31}}
   </div>
+  <div class="tabel_buttons">
+  <button type="button" onclick="Tabel();" class="btn btn-outline-dark" name="button">Расчитать</button>
+  <input type="button" onclick="Tabel();" class="btn btn-success tItem_submit" name="" value="Расчитать и добавить">
+  </div>
+</div>
 
   <div class="summary_times">
-  {{tabel.sHours1.label}}{{tabel.sHours1}}
-  {{tabel.sHours2.label}}{{tabel.sHours2}}
-  {{tabel.sHours3.label}}{{tabel.sHours3}}
-  {{tabel.sHours4.label}}{{tabel.sHours4}}
-  {{tabel.sHours5.label}}{{tabel.sHours5}}
-  {{tabel.sHours6.label}}{{tabel.sHours6}}
-  {{tabel.sHours7.label}}{{tabel.sHours7}}
+   <p class="st">{{tabel.sHours1.label}}{{tabel.sHours1}}</p>
+   <p class="st">{{tabel.sHours2.label}}{{tabel.sHours2}}</p>
+   <p class="st">{{tabel.sHours3.label}}{{tabel.sHours3}}</p>
+
+   <p class="st">{{tabel.sHours5.label}}{{tabel.sHours5}}</p>
+   <p class="st">{{tabel.sHours6.label}}{{tabel.sHours6}}</p>
+   <p class="st">{{tabel.sHours7.label}}{{tabel.sHours7}}</p>
   <!-- {{tabel.sHours8.label}}{{tabel.sHours8}} -->
-  {{tabel.sHours9.label}}{{tabel.sHours9}}
+   <p class="st">{{tabel.sHours9.label}}{{tabel.sHours9}}</p>
   <!-- {{tabel.sHours10.label}}{{tabel.sHours10}} -->
-  {{tabel.sHours11.label}}{{tabel.sHours11}}
-  {{tabel.sHours12.label}}{{tabel.sHours12}}
+   <p class="st">{{tabel.sHours11.label}}{{tabel.sHours11}}</p>
+   <p class="st">{{tabel.sHours12.label}}{{tabel.sHours12}}</p>
   <!-- {{tabel.sHours13.label}}{{tabel.sHours13}} -->
-  {{tabel.sHours14.label}}{{tabel.sHours14}}
-  {{tabel.sHours15.label}}{{tabel.sHours15}}
-  {{tabel.sHours16.label}}{{tabel.sHours16}}
-  {{tabel.sHours17.label}}{{tabel.sHours17}}
-  {{tabel.sHours18.label}}{{tabel.sHours18}}
-  {{tabel.sHours19.label}}{{tabel.sHours19}}
-  {{tabel.sHours20.label}}{{tabel.sHours20}}
-  {{tabel.sHours21.label}}{{tabel.sHours21}}
-  {{tabel.sHours22.label}}{{tabel.sHours22}}
+   <p class="st">{{tabel.sHours14.label}}{{tabel.sHours14}}</p>
+   <p class="st">{{tabel.sHours15.label}}{{tabel.sHours15}}</p>
+   <p class="st">{{tabel.sHours16.label}}{{tabel.sHours16}}</p>
+   <p class="st">{{tabel.sHours17.label}}{{tabel.sHours17}}</p>
+   <p class="st">{{tabel.sHours18.label}}{{tabel.sHours18}}</p>
+   <p class="st">{{tabel.sHours19.label}}{{tabel.sHours19}}</p>
+   <p class="st">{{tabel.sHours20.label}}{{tabel.sHours20}}</p>
+   <p class="st">{{tabel.sHours21.label}}{{tabel.sHours21}}</p>
+   <p class="st">{{tabel.sHours22.label}}{{tabel.sHours22}}</p>
   <!-- {{tabel.sHours23.label}}{{tabel.sHours23}} -->
-  {{tabel.sHours24.label}}{{tabel.sHours24}}
-  {{tabel.sHours25.label}}{{tabel.sHours25}}
+    <p class="st">   {{tabel.sHours24.label}}{{tabel.sHours24}}</p>
+    <p class="st">   {{tabel.sHours25.label}}{{tabel.sHours25}}</p>
   <!-- {{tabel.sHours26.label}}{{tabel.sHours26}} -->
   <!-- {{tabel.sHours27.label}}{{tabel.sHours27}} -->
-  {{tabel.sHours28.label}}{{tabel.sHours28}}
-  <!-- {{tabel.sHours29.label}}{{tabel.sHours29}} -->
+    <p class="st">   {{tabel.sHours28.label}}{{tabel.sHours28}}</p>
+    <p class="st">   {{tabel.sHours37.label}}{{tabel.sHours37}}</p>
+  <p class='st'>{{tabel.sHours38.label}}{{tabel.sHours38}}</p>
   <!-- {{tabel.sHours30.label}}{{tabel.sHours30}}
   {{tabel.sHours31.label}}{{tabel.sHours31}}
   {{tabel.sHours32.label}}{{tabel.sHours32}}
@@ -192,6 +272,7 @@
 
 
 </form>
+</div>
 </div>
 </div>
 {%endblock%}

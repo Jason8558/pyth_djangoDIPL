@@ -8,14 +8,23 @@
 {%block content%}
 {% if form.errors%}
 
-<div class="alert alert-danger mt-5" role="alert">
-{{form.errors}}
+<div class="alert alert-danger mt-5" id="form_error" role="alert">
+  <ul>
+  {{errs}}
+  </ul>
+
+
 </div>
 {%endif%}
+
 <form class="add_form sick_list" action="" method="post">
   {% csrf_token %}
-  <p>Номер реестра:{{form.sd_reg_number}}</p>
-  <p>{{form.sd_number.label}}{{form.sd_number}}</p>
+
+
+
+  <p>Номер реестра: {{reg_num}}</p>
+
+  <p>{{form.sd_number.label}}{{form.sd_number}}  <a class="btn btn-warning btn-sm" type="button" style="margin-top: 7px;" onclick="check_SickDoc()" > Проверить номер </a></p>
   <p>{{form.sd_emp.label}}{{form.sd_emp}}</p>
   <p>{{form.sd_pos.label}}{{form.sd_pos}}</p>
   <p>{{form.sd_dep.label}}{{form.sd_dep}}</p>
@@ -25,11 +34,11 @@
 
 
 
-<input class="btn btn-outline-info" onclick="ClearEnter()" type="submit" value="Добавить больничный лист в реестр" />
+<input class="btn btn-success" onclick="ClearEnter()" type="submit" value="Добавить больничный лист в реестр" />
 
 
-  <input type="button" onclick="CreateList();" class="btn btn-success" name="" value="Сформировать реестр">
-  <a class="btn btn-outline-danger" href="/journals/sick_regs">Отмена</a>
+
+  <a class="btn btn-outline-danger" href="/sick_regs">Отмена</a>
 </form>
 
 {%endblock%}

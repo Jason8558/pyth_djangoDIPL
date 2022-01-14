@@ -1,4 +1,5 @@
 settings.py
+log.txt
 db.sqlite3
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -10,7 +11,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
+
 develop-eggs/
 dist/
 downloads/
@@ -70,7 +71,6 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/_build/
 
 # PyBuilder
 target/
@@ -128,3 +128,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+hrd_docFlow/settings.py
+hrd_docFlow/settings.py

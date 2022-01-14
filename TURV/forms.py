@@ -8,9 +8,6 @@ class TabelItem_form(forms.ModelForm):
             model = TabelItem
             fields = [
             'employer',
-            'position',
-            'level',
-            'positionOfPayment',
             'type_time1',
             'type_time2',
             'type_time3',
@@ -107,38 +104,69 @@ class TabelItem_form(forms.ModelForm):
             'sHours32',
             'sHours33',
             'sHours34',
+            'sHours35',
+            'sHours37',
+            'sHours38',
             'w_days',
             'w_hours',
             'v_days',
             'v_hours'
             ]
 
+        hours1 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours2 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours3 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours4 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours5 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours6 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours7 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours8 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours9 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours10 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours11 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours12 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours13 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours14 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours15 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours16 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours17 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours18 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours19 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours20 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours21 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours22 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours23 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours24 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours25 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours26 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours27 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours28 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours29 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours30 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+        hours31 = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Ч', 'class': 'dig_hours', 'type':'text'}))
+
+
+
+
         def saveFirst(self, bound_tabel):
             b_tabel = Tabel.objects.get(id=bound_tabel)
-            emp = self.cleaned_data['employer'].id
-            print(emp)
-            dep = b_tabel.department
+            emp = self.cleaned_data['employer']
             year_ = b_tabel.year
             month = b_tabel.month
-            employer = Employers.objects.get(id = self.cleaned_data['employer'].id)
-            emp_name = employer.fullname
-            emp_position = employer.position
-            emp_level = employer.level
-            emp_PoP = employer.positionOfPayment
+            emp_name = emp.fullname
+            emp_position = emp.position
+            emp_level = emp.level
+            emp_PoP = emp.positionOfPayment
+
 
 
 
             new_item = TabelItem.objects.create(
 
-            bound_tabel = bound_tabel,
-            employer = employer,
-            
+            bound_tabel_id = b_tabel.id,
+            employer = emp,
             year = year_,
             month = month,
-            department = dep,
-            position = emp_position,
-            level = emp_level,
-            positionOfPayment = emp_PoP,
             type_time1 = self.cleaned_data['type_time1'],
             type_time2 = self.cleaned_data['type_time2'],
             type_time3 = self.cleaned_data['type_time3'],
@@ -235,6 +263,8 @@ class TabelItem_form(forms.ModelForm):
             sHours32 = self.cleaned_data['sHours32'],
             sHours33 = self.cleaned_data['sHours33'],
             sHours34 = self.cleaned_data['sHours34'],
+            sHours35 = self.cleaned_data['sHours35'],
+            sHours38 = self.cleaned_data['sHours38'],
             w_days = self.cleaned_data['w_days'],
             w_hours = self.cleaned_data['w_hours'],
             v_days = self.cleaned_data['v_days'],
@@ -249,12 +279,13 @@ class TabelItem_form(forms.ModelForm):
 class Tabel_form(forms.ModelForm):
     class Meta:
         model = Tabel
-        fields = ['year', 'month', 'department', 'del_check']
+        fields = ['year', 'month', 'department', 'del_check', 'sup_check']
 
-    # department = forms.CharField(label=' ', widget=forms.Select(
-    #     attrs={ 'type':'text'}))
-
+    year = forms.CharField(label="Год (ТОЛЬКО 4 ЦИФРЫ!)", widget=forms.NumberInput(attrs={'maxlength':'4'}))
     def saveFirst(self, user_):
+        log = open('log.txt', 'a')
+        log.write(str(DT.date.today()) + " пользователь " +str(user_) + " создал табель " + str(self.cleaned_data['department']) + " за " + str(self.cleaned_data['year']) + '.' + str(self.cleaned_data['month'] ))
+        log.close()
         new_tabel = Tabel.objects.create(
             year = self.cleaned_data['year'],
             month = self.cleaned_data['month'],
@@ -265,3 +296,34 @@ class Tabel_form(forms.ModelForm):
         )
 
         return new_tabel
+
+class Employer_form(forms.ModelForm):
+    class Meta:
+        model = Employers
+        fields = ['fullname', 'sex', 'position', 'department', 'level', 'positionOfPayment', 'shift_personnel', 'stand_worktime', 'fired']
+
+    def saveFirst(self):
+        new_employer = Employers.objects.create(
+            fullname  = self.cleaned_data['fullname'],
+            sex = self.cleaned_data['sex'],
+            position = self.cleaned_data['position'],
+            shift_personnel = self.cleaned_data['shift_personnel'],
+            fired = self.cleaned_data['fired'],
+            stand_worktime = self.cleaned_data['stand_worktime'],
+            department = self.cleaned_data['department'],
+            level = self.cleaned_data['level'],
+            positionOfPayment = self.cleaned_data['positionOfPayment']
+
+    )
+        return new_employer
+
+class Position_form(forms.ModelForm):
+    class Meta:
+        model = Position
+        fields = ['name']
+
+    def saveFirst(self):
+        new_position = Position.objects.create(
+            name = self.cleaned_data['name']
+        )
+        return new_position
